@@ -28,3 +28,42 @@ After synthesis, it is crucial to analyze the design statistics to understand th
 * **Number of D-Flip-Flops:** 1613
 * **Flop Ratio Calculation:** `(Number of D-Flip-Flops / Total Number of Cells)`
 * **Flop Ratio:** 1613 / 14876 = **0.1084** (or **10.84%**)
+
+## Day 2: Good Floorplan vs. Bad Floorplan and Introduction to Library Cells
+
+### Floorplanning
+The floorplanning phase is critical for the physical design flow. It involves:
+* Defining the **Core and Die area**.
+* Setting the **Aspect Ratio** and **Utilization Factor**.
+* Placing **I/O Pins** along the perimeter.
+* Placing **Decoupling Capacitors** (Decap cells) and pre-placed macros.
+* Generating the **Power Distribution Network (PDN)** (VDD and VSS power straps).
+
+To run the floorplan in OpenLANE, use the following command:
+```tcl
+run_floorplan
+```
+Successful Power Distribution Network (PDN) Generation:
+
+Floorplan Layout in Magic:
+(Notice the rows defined for standard cells and the I/O pins placed evenly around the edges).
+
+I/O Pin Placement Analysis:
+Using the what command in the Magic tkcon console, we can inspect the specific metal layers used for our I/O pins.
+
+Placement
+Once the floorplan is set, the tool moves on to Placement. This occurs in two stages:
+
+Global Placement: The tool places standard cells to minimize wire length, ignoring overlaps.
+
+Detailed Placement: The tool legalizes the cells by ensuring they fit exactly into the standard cell rows without any overlaps.
+
+To run placement in OpenLANE:
+
+```tcl
+run_placement
+```
+Global Placement View:
+
+Detailed Placement View (Zoomed In):
+(Here we can see the individual standard cells strictly aligned to the power and ground rails).
