@@ -246,4 +246,6 @@ Final DRC execution log confirming exactly 0 total violations, verifying the des
 ![Zero DRC Violations](images/Day_5_0_drc.png)
 
 
+## Acknowledgement
 
+I would like to express my sincere gratitude to **Kunal Ghosh** (Co-founder, VSD Corp. Pvt. Ltd.) and the entire **VLSI System Design (VSD) Team** for their excellent instruction and for providing the platform to learn Advanced Physical Design. Special thanks to the open-source community, the **Efabless OpenLANE team**, and Google for making the SkyWater 130nm PDK accessible to learners and researchers everywhere.
