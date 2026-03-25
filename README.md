@@ -6,7 +6,7 @@ The RTL to GDSII flow is the process of translating a logical Register Transfer 
 ### Invoking OpenLANE
 The first step is to invoke the OpenLANE docker container and start the interactive flow.
 
-![Invoking OpenLANE](images/openlane%20-docekr.png)
+![Invoking OpenLANE](images/openlane_docekr.png)
 
 ### Running Synthesis
 Logic synthesis translates the RTL code into a gate-level netlist using standard cells from the Sky130 PDK. 
