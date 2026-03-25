@@ -81,28 +81,63 @@ Standard cells are the fundamental building blocks of digital physical design. I
 
 **Cloning the Custom Inverter Repository:**
 We start by cloning the `vsdstdcelldesign` repository, which contains the Magic layout of a custom CMOS inverter, and opening it using the Magic layout tool.
+![Cloning Repo](images/Day_3_Inv.png)
 
 **Inverter Layout in Magic:**
+![Magic Layout](images/Day_3_Inv_layout.png)
 
 **Identifying the NMOS and PMOS regions:**
 Using the `what` command in the tkcon window, we can identify the specific mask layers used to build the PMOS and NMOS transistors.
+![NMOS and PMOS](images/Day_3_Inv_n_p_mos.png)
 
 **SPICE Extraction from Magic:**
 To simulate the behavior of this layout, we must extract its parasitic resistance and capacitance into a SPICE netlist. We do this using the `extract all` and `ext2spice` commands in the tkcon window.
+![Extraction Commands](images/Day_3_grid_size.png)
 
 **Modifying the SPICE Deck:**
 The extracted SPICE netlist (`sky130_inv.spice`) needs to be modified to include the correct standard cell library models, power supply voltages (VDD = 3.3V, VSS = 0V), input pulse parameters, and the `.tran` command for transient analysis.
+![SPICE Deck](images/Day_3_Inv_Spice.png)
 
 **Running ngspice Simulation:**
 With the SPICE deck configured, we simulate the circuit using `ngspice` to plot the output voltage (`y`) against the input voltage (`a`) over time.
+![ngspice Terminal](images/Day_3_ng_spice_popup.png)
+![Terminal Output](images/Day_3_ng_spice.png)
 
 **Transient Analysis Waveform:**
+![Waveform Graph](images/Day_3_graph.png)
 
 **Characterizing the Cell Timing:**
-To use this custom cell in our OpenLANE flow, we need to characterize its timing parameters from the graph coordinates. We calculate four main values:
-1. **Rise Time:** Time taken for the output to rise from 20% to 80% of its maximum value.
-2. **Fall Time:** Time taken for the output to fall from 80% to 20% of its maximum value.
-3. **Cell Rise Delay:** Difference in time between the input falling to 50% and the output rising to 50%.
-4. **Cell Fall Delay:** Difference in time between the input rising to 50% and the output falling to 50%.
+To use this custom cell in our OpenLANE flow, we need to characterize its timing parameters from the graph coordinates. We calculate four main values based on the 20% (0.66V), 50% (1.65V), and 80% (2.64V) voltage thresholds:
 
-*(You can enter your calculated values from your terminal here!)*
+1. **Rise Time:** Time taken for the output to rise from 20% to 80% of its maximum value.
+   * `2.24567ns - 2.18161ns = 0.06406ns` (**64.06ps**)
+2. **Fall Time:** Time taken for the output to fall from 80% to 20% of its maximum value.
+   * `4.09402ns - 4.05212ns = 0.0419ns` (**41.9ps**)
+3. **Cell Rise Delay:** Difference in time between the input falling to 50% and the output rising to 50%.
+   * `~0.060ns` (**60ps**)
+4. **Cell Fall Delay:** Difference in time between the input rising to 50% and the output falling to 50%.
+   * `~0.028ns` (**28ps**)
+   ![Calculating Coordinates](images/Day_3_graph_in_op_coordinates.png)
+
+### Part 2: Magic Layout DRC (Design Rule Checks)
+Design Rule Checks (DRC) ensure that the physical layout of a chip satisfies the manufacturing constraints set by the foundry (in this case, Skywater 130nm). If a layout fails DRC, the chip will likely fail after fabrication.
+
+**Downloading DRC Test Files:**
+We begin by fetching and extracting a set of predefined DRC test layouts from the Open Circuit Design archive to observe how Magic flags rule violations.
+![Downloading DRC Tests](images/Day_3_DRC.png)
+
+**Observing DRC Rules in Magic:**
+Opening the test layout in Magic, we can visually inspect various structures. Magic dynamically highlights layout violations with white error paint.
+![Valid and Invalid Rules](images/Day_3_valid_rules.png)
+
+**Analyzing Specific Rule Violations:**
+By selecting a region and using the tkcon console (or typing `drc why`), we can pinpoint the exact rule being broken. 
+For example, we examined an incorrect poly layout:
+![Incorrect Poly](images/Day_3_incorrect_poly.png)
+
+We also looked at an N-well violation, where the layout failed due to an incorrect overlap or missing tap rule:
+![N-well DRC Error](images/Day_3_drc_check.png)
+
+**Modifying the Tech File / Environment:**
+To fix certain unresolved DRC rules or update the environment variables, we can use text editors like `gvim` to modify the `sky130A.tech` file or the `.magicrc` startup script.
+![Editing with Gvim](images/Day_3_Gvim_drc.png)
