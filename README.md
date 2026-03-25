@@ -141,3 +141,56 @@ We also looked at an N-well violation, where the layout failed due to an incorre
 **Modifying the Tech File / Environment:**
 To fix certain unresolved DRC rules or update the environment variables, we can use text editors like `gvim` to modify the `sky130A.tech` file or the `.magicrc` startup script.
 ![Editing with Gvim](images/Day_3_Gvim_drc.png)
+
+## Day 4: Pre-layout Timing Analysis and Importance of Good Clock Tree
+
+### Part 1: Extracting LEF and Integrating the Custom Cell
+To use our custom `sky130_vsdinv` cell in OpenLANE, we must convert the Magic layout into a standard LEF (Library Exchange Format) file. The LEF hides the internal routing details and only exposes the PR boundary, I/O pins, and power/ground rails to the placement and routing tools.
+
+Before extraction, we ensure the pins align perfectly with the routing grid defined in the `tracks.info` file.
+![Checking Grid Conditions](images/Day_4_checking_condition.png)
+![Tracks Info](images/Day_4_Tracks.png)
+
+**Extracting the LEF from Magic:**
+![LEF Extraction](images/Day_4_Extracting_LEF.png)
+
+**Updating Config.tcl:**
+We modify our design's `config.tcl` file to include our custom LEF file and point the flow to the extra library elements.
+![Editing Config](images/Day_4_editing_config_file.png)
+
+### Part 2: Synthesis and Fixing Timing Violations
+With the custom cell integrated, we run synthesis. We can verify that our custom inverter was successfully mapped into the netlist by checking the chip area report.
+![Custom Cell in Netlist](images/Day_4_chip_area.png)
+
+**The Problem: Negative Slack**
+Our initial synthesis run resulted in massive timing violations. The Total Negative Slack (`tns`) and Worst Negative Slack (`wns`) were heavily negative.
+![Negative Slack Violation](images/Day_4_synthesis.png)
+
+**Static Timing Analysis (STA):**
+Using OpenSTA outside of the OpenLANE flow, we analyzed the specific failing paths. We found high fanout nets and high delay instances causing the setup time violations.
+![STA Violation Path](images/Day_4_sta_val.png)
+![Analyzing High Fanout Nets](images/Day_4_sta_report_net.png)
+
+**Fixing the Slack:**
+To fix this, we performed iterative tuning of the synthesis environment variables. We modified parameters like `SYNTH_STRATEGY`, `SYNTH_SIZING`, and `SYNTH_MAX_FANOUT` to force the tool to prioritize delay over area and upsize driving cells.
+![Tuning Variables 1](images/Day_4_editing_SYNTH_variables.png)
+![Tuning Variables 2](images/Day_4_redoing_syn_for_diff_val.png)
+![Final Tuning in Config](images/Day_4_editing_config-file_again.png)
+
+**Success!**
+After aggressively tuning the parameters and replacing weak cells with higher drive-strength equivalents, we successfully achieved a clean timing report with `tns 0.00` and `wns 0.00`.
+![Clean Timing](images/Day_4_syn_complete_FP.png)
+
+### Part 3: Floorplan and Placement Verification
+With clean timing, we re-ran floorplan and placement. Opening the newly placed DEF file in Magic, we can zoom in and verify that our custom `sky130_vsdinv` cell is legally placed and perfectly overlaps with the power and ground rails.
+![Running Placement](images/Day_4_placement.png)
+![Placement in Magic](images/Day_4_placement_magic.png)
+![Expanded Custom Cell](images/Day_4_expand_vsd_inv.png)
+![Custom Cell Placement Verification](images/Day_4_vds_inv_placement.png)
+
+### Part 4: Clock Tree Synthesis (CTS)
+To ensure the clock signal reaches every sequential element (flip-flop) at the same time, we synthesize a Clock Tree using TritonCTS. The goal is to minimize clock skew and latency.
+
+```tcl
+run_cts
+```
