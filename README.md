@@ -44,19 +44,24 @@ To run the floorplan in OpenLANE, use the following command:
 run_floorplan
 ```
 Successful Power Distribution Network (PDN) Generation:
+![PDN Generation](images/Day_2_FP_Comp.png)
 
 Floorplan Layout in Magic:
-(Notice the rows defined for standard cells and the I/O pins placed evenly around the edges).
+Notice the rows defined for standard cells and the I/O pins placed evenly around the edges.![Floorplan Layout](images/Day_2_FP.png)
 
 I/O Pin Placement Analysis:
 Using the what command in the Magic tkcon console, we can inspect the specific metal layers used for our I/O pins.
+![Vertical Pins](images/Day_2_V_ML.png)
+![Horizontal Pins](images/Day_2_H_ML.png)
 
 Placement
 Once the floorplan is set, the tool moves on to Placement. This occurs in two stages:
 
 Global Placement: The tool places standard cells to minimize wire length, ignoring overlaps.
+![Global Placement](images/Day_2_placement.png)
 
 Detailed Placement: The tool legalizes the cells by ensuring they fit exactly into the standard cell rows without any overlaps.
+
 
 To run placement in OpenLANE:
 
@@ -66,4 +71,5 @@ run_placement
 Global Placement View:
 
 Detailed Placement View (Zoomed In):
-(Here we can see the individual standard cells strictly aligned to the power and ground rails).
+Here we can see the individual standard cells strictly aligned to the power and ground rails.
+![Detailed Placement](images/Day_2_detailed_view.png)
